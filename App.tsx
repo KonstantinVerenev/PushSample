@@ -1,48 +1,32 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
 import {Button, SafeAreaView, StyleSheet, Text, View} from 'react-native';
 
 import {useNotification} from './src/hooks/useNotification';
 
-import {useMessaging} from './src/hooks/useMessaging';
-
 const App = () => {
-  const {getFCMToken, foregroundMessageHandler, backgroundMessageHandler} =
-    useMessaging();
-  const {displayNotification} = useNotification();
+  const {
+    getFCMToken,
+    setBackgroundMessageHandler,
+    setForegroundMessageHandler,
+    displayNotification,
+  } = useNotification();
 
-  //
-  const [token, setToken] = useState('');
-
-  // both handlers on one function
-  async function onMessageReceived({
-    notification,
-  }: {
-    notification: {title: string; body: string};
-  }) {
-    displayNotification(notification.title, notification.body);
-  }
-
-  //
   useEffect(() => {
-    //get FCM Token
-    const setFCMTokenToState = async () => {
+    // get FCM Token and set it to API
+    const setFCMTokenToAPI = async () => {
       const FCMToken = await getFCMToken();
 
       console.log(FCMToken);
 
-      setToken(FCMToken);
+      //setTokenToAPI(FCMToken);
     };
 
-    setFCMTokenToState();
-
-    // Here we can sent Token to API
-    // fetch token
+    setFCMTokenToAPI();
 
     // set message handlers
-    foregroundMessageHandler(onMessageReceived);
-    backgroundMessageHandler(onMessageReceived);
+    setBackgroundMessageHandler();
+    setForegroundMessageHandler();
 
-    //return need to unsubscribe off foreground messages, back ground listener need to be called on entry point
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
